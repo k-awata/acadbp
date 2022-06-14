@@ -37,7 +37,7 @@ var dwgoutCmd = &cobra.Command{
 	Short:   "Convert input drawing files to DWG files",
 	Long:    "Convert input drawing files to DWG files",
 	Example: `  acadbp dwgout *.dxf
-  acadbp dwgout --format LT2010 *.dwg`,
+  acadbp dwgout --format 2010 *.dwg`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		files := acadbp.ExpandGlobPattern(args)
