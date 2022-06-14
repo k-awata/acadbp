@@ -48,6 +48,18 @@ var initconfCmd = &cobra.Command{
 			return
 		}
 		viper.Set("accorepath", abs)
+		home, err := os.UserHomeDir()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
+		conf := filepath.Join(home, ".acadbp.yaml")
+		if _, err := os.Stat(conf); err != nil {
+			if _, err := os.Create(conf); err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				return
+			}
+		}
 		if err := viper.WriteConfig(); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
