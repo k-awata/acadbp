@@ -61,14 +61,14 @@ func CreateDsdTarget(ftype string, multi string) (string, error) {
 		return "", err
 	}
 	// DWF=
-	dwf := out + `\plot.dwf`
+	dwf := filepath.Join(out, "plot.dwf")
 	if multi != "" {
 		dwf, err = filepath.Abs(multi)
 		if err != nil {
 			return "", err
 		}
 	}
-	return "[Target]\r\nType=" + no + "\r\nDWF=" + dwf + "\r\nOUT=" + out + "\\\r\nPWD=\r\n", nil
+	return "[Target]\r\nType=" + no + "\r\nDWF=" + dwf + "\r\nOUT=" + out + string(os.PathSeparator) + "\r\nPWD=\r\n", nil
 }
 
 // CreateDsdSheets returns [DWF6Sheet:*] sections of dsd file for each drawing file
