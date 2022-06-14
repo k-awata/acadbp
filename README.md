@@ -20,6 +20,8 @@ AutoCAD 2013 or AutoCAD LT 2013 for Windows, or later version (publish command r
    go install github.com/k-awata/acadbp@latest
    ```
 
+   Otherwise you can download a binary from [Releases](https://github.com/k-awata/acadbp/releases).
+
 2. You need to make a `.acadbp.yaml` file in the home directory to specify the path to `accoreconsole.exe` in your AutoCAD installed directory. You can make it with the following command:
 
    ```bat
@@ -55,13 +57,13 @@ AutoCAD 2013 or AutoCAD LT 2013 for Windows, or later version (publish command r
 - Publishing PDF files from all DXF files in the current directory by using page setup `Setup1` of `setup.dwg`
 
   ```bat
-  acadbp publish --setup-file setup.dwg --setup-name Setup1 *.dxf
+  acadbp publish --type pdf --setup-file setup.dwg --setup-name Setup1 *.dxf
   ```
 
 - Publishing multi sheet PDF
 
   ```bat
-  acadbp publish --setup-file setup.dwg --setup-name Setup1 --multi multi-sheet.pdf *.dxf
+  acadbp publish --type pdf --setup-file setup.dwg --setup-name Setup1 --multi multi-sheet.pdf *.dxf
   ```
 
 ## License
