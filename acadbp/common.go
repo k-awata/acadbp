@@ -41,7 +41,7 @@ func StdinToString() string {
 	s := bufio.NewScanner(os.Stdin)
 	var buf bytes.Buffer
 	for s.Scan() {
-		buf.WriteString(s.Text() + "\n")
+		buf.WriteString(s.Text() + "\r\n")
 	}
 	return buf.String()
 }
