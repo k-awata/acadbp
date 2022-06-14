@@ -10,7 +10,7 @@ Batch processing utility using accoreconsole in AutoCAD or LT
 
 ## Requirements
 
-AutoCAD 2013 or AutoCAD LT 2013 for Windows, or later version
+AutoCAD 2013 or AutoCAD LT 2013 for Windows, or later version (publish command requires 2015 or later)
 
 ## Installation
 
