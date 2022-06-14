@@ -23,7 +23,7 @@ AutoCAD 2013 or AutoCAD LT 2013 for Windows, or later version
 2. You need to make a `.acadbp.yaml` file in the home directory to specify the path to `accoreconsole.exe` in your AutoCAD installed directory. You can make it with the following command:
 
    ```bat
-   echo accorepath: C:\Program Files\Autodesk\<your-acad-installed-dir>\accoreconsole.exe > %userprofile%\.acadbp.yaml
+   acadbp initconf "C:\Program Files\Autodesk\<your-acad-installed-dir>\accoreconsole.exe"
    ```
 
 ## Usage
