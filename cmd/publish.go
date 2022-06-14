@@ -43,7 +43,7 @@ var publishCmd = &cobra.Command{
 
 		// Create dsd file
 		tmpl := "[DWF6Version]\r\nVer=1\r\n[DWF6MinorVersion]\r\nMinorVer=1\r\n"
-		if viper.IsSet("publish.dsd") {
+		if viper.GetString("publish.dsd") != "" {
 			var err error
 			tmpl, err = acadbp.ReadTemplateDsd(viper.GetString("publish.dsd"))
 			if err != nil {
