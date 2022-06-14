@@ -42,16 +42,16 @@ var dxfoutCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		files := acadbp.ExpandGlobPattern(args)
 
-		scr, err := acadbp.CreateScr("_.saveas DXF " +
-			"P " + acadbp.BoolToYesNo(viper.GetBool("dxf.preview")) + " " +
-			"V " + viper.GetString("dxf.format") + " " +
-			viper.GetString("dxf.dp") + " \r\nY\r\n")
+		scr, err := acadbp.CreateTempFile("*.scr", "_.saveas DXF "+
+			"P "+acadbp.BoolToYesNo(viper.GetBool("dxf.preview"))+" "+
+			"V "+viper.GetString("dxf.format")+" "+
+			viper.GetString("dxf.dp")+" \r\nY\r\n")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
 
-		bat, err := acadbp.CreateBat(viper.GetString("accorepath"), scr, viper.GetString("log"), files)
+		bat, err := acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return

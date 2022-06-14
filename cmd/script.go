@@ -44,14 +44,14 @@ var scriptCmd = &cobra.Command{
 		scr := args[0]
 		if scr == "-" {
 			var err error
-			scr, err = acadbp.CreateScr(acadbp.StdinToString())
+			scr, err = acadbp.CreateTempFile("*.scr", acadbp.StdinToString())
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return
 			}
 		}
 
-		bat, err := acadbp.CreateBat(viper.GetString("accorepath"), scr, viper.GetString("log"), files)
+		bat, err := acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return

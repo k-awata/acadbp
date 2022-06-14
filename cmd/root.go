@@ -36,7 +36,7 @@ var rootCmd = &cobra.Command{
 	Use:     "acadbp",
 	Short:   "Batch processing utility using accoreconsole in AutoCAD or LT",
 	Long:    "Batch processing utility using accoreconsole in AutoCAD or LT",
-	Version: "0.1.1",
+	Version: "0.2.0",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },

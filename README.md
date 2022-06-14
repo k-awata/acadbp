@@ -6,6 +6,7 @@ Batch processing utility using accoreconsole in AutoCAD or LT
 
 - Bulk conversion of drawing files to specified version of DWG or DXF files
 - Running the same script file for each input drawing file
+- Publishing drawing files using specified page setup
 
 ## Requirements
 
@@ -49,6 +50,18 @@ AutoCAD 2013 or AutoCAD LT 2013 for Windows, or later version
 
   ```bat
   acadbp script example.scr *.dwg
+  ```
+
+- Publishing PDF files from all DXF files in the current directory by using page setup `Setup1` of `setup.dwg`
+
+  ```bat
+  acadbp publish --setup-file setup.dwg --setup-name Setup1 *.dxf
+  ```
+
+- Publishing multi sheet PDF
+
+  ```bat
+  acadbp publish --setup-file setup.dwg --setup-name Setup1 --multi multi-sheet.pdf *.dxf
   ```
 
 ## License
