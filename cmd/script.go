@@ -24,6 +24,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/k-awata/acadbp/acadbp"
 	"github.com/spf13/cobra"
@@ -41,10 +42,17 @@ var scriptCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		files := acadbp.ExpandGlobPattern(args[1:])
 
-		scr := args[0]
-		if scr == "-" {
-			var err error
-			scr, err = acadbp.CreateTempFile("*.scr", acadbp.StdinToString())
+		// Read file, or stdio if arg is "-"
+		scr := ""
+		var err error
+		if args[0] == "-" {
+			scr, err = acadbp.CreateTempFile("*.scr", acadbp.StdinToString(), viper.GetBool("sjis"))
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				return
+			}
+		} else {
+			scr, err = filepath.Abs(args[0])
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return

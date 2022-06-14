@@ -45,7 +45,7 @@ var publishCmd = &cobra.Command{
 		tmpl := "[DWF6Version]\r\nVer=1\r\n[DWF6MinorVersion]\r\nMinorVer=1\r\n"
 		if viper.GetString("publish.dsd") != "" {
 			var err error
-			tmpl, err = acadbp.ReadTemplateDsd(viper.GetString("publish.dsd"))
+			tmpl, err = acadbp.ReadTemplateDsd(viper.GetString("publish.dsd"), true)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return
@@ -67,13 +67,13 @@ var publishCmd = &cobra.Command{
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
-		dsd, err := acadbp.CreateTempFile("*.dsd", tmpl+trg+shts)
+		dsd, err := acadbp.CreateTempFile("*.dsd", tmpl+trg+shts, true)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
 
-		scr, err := acadbp.CreateTempFile("*.scr", "_.-publish "+dsd+"\r\n")
+		scr, err := acadbp.CreateTempFile("*.scr", "_.-publish "+dsd+"\r\n", viper.GetBool("sjis"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return

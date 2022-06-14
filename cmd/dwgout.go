@@ -42,7 +42,7 @@ var dwgoutCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		files := acadbp.ExpandGlobPattern(args)
 
-		scr, err := acadbp.CreateTempFile("*.scr", "_.saveas "+viper.GetString("dwg.format")+" \r\nY\r\n")
+		scr, err := acadbp.CreateTempFile("*.scr", "_.saveas "+viper.GetString("dwg.format")+" \r\nY\r\n", viper.GetBool("sjis"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return

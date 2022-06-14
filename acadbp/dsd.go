@@ -7,19 +7,28 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 )
 
 // ReadTemplateDsd returns dsd file contents without [Target], [DWF6Sheet:*] and [MRU *] sections
-func ReadTemplateDsd(dsd string) (string, error) {
+func ReadTemplateDsd(dsd string, sjis bool) (string, error) {
 	file, err := os.Open(dsd)
 	if err != nil {
 		return "", err
 	}
 	defer file.Close()
-	s := bufio.NewScanner(file)
-	var buf bytes.Buffer
+	// for Japanese
+	var s *bufio.Scanner
+	if sjis {
+		s = bufio.NewScanner(transform.NewReader(file, japanese.ShiftJIS.NewDecoder()))
+	} else {
+		s = bufio.NewScanner(file)
+	}
 	skip := false
 	first := true
+	var buf bytes.Buffer
 	for s.Scan() {
 		str := s.Text()
 		// Check if input is dsd format

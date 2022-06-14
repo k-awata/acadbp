@@ -9,6 +9,9 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 )
 
 // BoolToYesNo returns "Y" if b is true, otherwise "N"
@@ -47,13 +50,21 @@ func StdinToString() string {
 }
 
 // CreateTempFile creates a new file to temp directory and then writes contents and returns that filepath
-func CreateTempFile(name string, contents string) (string, error) {
+func CreateTempFile(name string, contents string, sjis bool) (string, error) {
 	temp, err := os.CreateTemp("", name)
 	if err != nil {
 		return "", err
 	}
 	defer temp.Close()
-	if _, err := temp.WriteString(contents); err != nil {
+	// for Japanese
+	str := contents
+	if sjis {
+		str, _, err = transform.String(japanese.ShiftJIS.NewEncoder(), contents)
+		if err != nil {
+			return "", err
+		}
+	}
+	if _, err := temp.WriteString(str); err != nil {
 		return "", err
 	}
 	return temp.Name(), nil
@@ -103,7 +114,7 @@ func CreateBatContents(accore string, scr string, log string, files []string) (s
 
 // Runbat executes bat commands
 func RunBat(bat string) error {
-	temp, err := CreateTempFile("*.bat", bat)
+	temp, err := CreateTempFile("*.bat", bat, true)
 	if err != nil {
 		return err
 	}
