@@ -51,6 +51,7 @@ var initconfCmd = &cobra.Command{
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
+		fmt.Println("acadbp saved config file")
 	},
 }
 
