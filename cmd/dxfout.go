@@ -45,7 +45,7 @@ var dxfoutCmd = &cobra.Command{
 		scr, err := acadbp.CreateTempFile("*.scr", "_.saveas DXF "+
 			"P "+acadbp.BoolToYesNo(viper.GetBool("dxf.preview"))+" "+
 			"V "+viper.GetString("dxf.format")+" "+
-			viper.GetString("dxf.dp")+" \r\nY\r\n", viper.GetBool("sjis"))
+			viper.GetString("dxf.dp")+" \r\nY\r\n", viper.GetString("encoding"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
@@ -62,7 +62,7 @@ var dxfoutCmd = &cobra.Command{
 			return
 		}
 
-		if err := acadbp.RunBat(bat); err != nil {
+		if err := acadbp.RunBatCommands(bat, viper.GetString("encoding")); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}

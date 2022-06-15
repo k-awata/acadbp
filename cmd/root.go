@@ -36,7 +36,7 @@ var rootCmd = &cobra.Command{
 	Use:     "acadbp",
 	Short:   "Batch processing utility using accoreconsole in AutoCAD or LT",
 	Long:    "Batch processing utility using accoreconsole in AutoCAD or LT",
-	Version: "0.3.0",
+	Version: "0.4.0",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -61,12 +61,12 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.acadbp.yaml)")
 
 	rootCmd.PersistentFlags().String("accorepath", "", "path to accoreconsole binary")
+	rootCmd.PersistentFlags().String("encoding", "utf8", "character encoding")
 	rootCmd.PersistentFlags().String("log", "acadbp.log", "log file")
-	rootCmd.PersistentFlags().Bool("sjis", false, "use shift_jis")
 
 	viper.BindPFlag("accorepath", rootCmd.PersistentFlags().Lookup("accorepath"))
+	viper.BindPFlag("encoding", rootCmd.PersistentFlags().Lookup("encoding"))
 	viper.BindPFlag("log", rootCmd.PersistentFlags().Lookup("log"))
-	viper.BindPFlag("sjis", rootCmd.PersistentFlags().Lookup("sjis"))
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

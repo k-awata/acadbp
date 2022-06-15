@@ -22,10 +22,10 @@ AutoCAD 2013 or AutoCAD LT 2013 for Windows, or later version (publish command r
 
    Otherwise you can download a binary from [Releases](https://github.com/k-awata/acadbp/releases).
 
-2. You need to make a `.acadbp.yaml` file in the home directory to specify the path to `accoreconsole.exe` in your AutoCAD installed directory. You can make it with the following command:
+2. You need to make a `.acadbp.yaml` file in the home directory to specify a character encoding and the path to `accoreconsole.exe` in your AutoCAD installed directory. You can make it with the following command:
 
    ```bat
-   acadbp initconf "C:\Program Files\Autodesk\<your-acad-installed-dir>\accoreconsole.exe"
+   acadbp initconf --encoding sjis --accorepath "C:\Program Files\Autodesk\<your-acad-ver>\accoreconsole.exe"
    ```
 
 ## Usage

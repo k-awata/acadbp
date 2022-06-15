@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -33,32 +32,20 @@ import (
 
 // initconfCmd represents the initconf command
 var initconfCmd = &cobra.Command{
-	Use:   "initconf accoreconsole_path",
-	Short: "Create acadbp config file to home directory",
-	Long:  "Create acadbp config file to home directory",
-	Args:  cobra.ExactArgs(1),
+	Use:     "initconf",
+	Short:   "Create acadbp config file to home directory",
+	Long:    "Create acadbp config file to home directory",
+	Example: `  acadbp initconf --encoding sjis --accorepath "C:\Program Files\Autodesk\<your-acad-ver>\accoreconsole.exe"`,
+	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		abs, err := filepath.Abs(args[0])
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
-		if !strings.EqualFold(filepath.Base(abs), "accoreconsole.exe") {
-			fmt.Fprintln(os.Stderr, "given path is not to accoreconsole.exe")
-			return
-		}
-		viper.Set("accorepath", abs)
 		home, err := os.UserHomeDir()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
-		conf := filepath.Join(home, ".acadbp.yaml")
-		if _, err := os.Stat(conf); err != nil {
-			if _, err := os.Create(conf); err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				return
-			}
+		if _, err := os.Create(filepath.Join(home, ".acadbp.yaml")); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
 		}
 		if err := viper.WriteConfig(); err != nil {
 			fmt.Fprintln(os.Stderr, err)

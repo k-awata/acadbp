@@ -46,7 +46,7 @@ var scriptCmd = &cobra.Command{
 		scr := ""
 		var err error
 		if args[0] == "-" {
-			scr, err = acadbp.CreateTempFile("*.scr", acadbp.StdinToString(), viper.GetBool("sjis"))
+			scr, err = acadbp.CreateTempFile("*.scr", acadbp.StdinToString(), viper.GetString("encoding"))
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return
@@ -65,7 +65,7 @@ var scriptCmd = &cobra.Command{
 			return
 		}
 
-		if err := acadbp.RunBat(bat); err != nil {
+		if err := acadbp.RunBatCommands(bat, viper.GetString("encoding")); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}

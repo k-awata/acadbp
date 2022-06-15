@@ -45,7 +45,7 @@ var publishCmd = &cobra.Command{
 		tmpl := "[DWF6Version]\r\nVer=1\r\n[DWF6MinorVersion]\r\nMinorVer=1\r\n"
 		if viper.GetString("publish.dsd") != "" {
 			var err error
-			tmpl, err = acadbp.ReadTemplateDsd(viper.GetString("publish.dsd"), true)
+			tmpl, err = acadbp.ReadTemplateDsd(viper.GetString("publish.dsd"), viper.GetString("encoding"))
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return
@@ -67,13 +67,13 @@ var publishCmd = &cobra.Command{
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
-		dsd, err := acadbp.CreateTempFile("*.dsd", tmpl+trg+shts, true)
+		dsd, err := acadbp.CreateTempFile("*.dsd", tmpl+trg+shts, viper.GetString("encoding"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
 
-		scr, err := acadbp.CreateTempFile("*.scr", "_.-publish "+dsd+"\r\n", viper.GetBool("sjis"))
+		scr, err := acadbp.CreateTempFile("*.scr", "_.-publish "+dsd+"\r\n", viper.GetString("encoding"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
@@ -85,7 +85,7 @@ var publishCmd = &cobra.Command{
 			return
 		}
 
-		if err := acadbp.RunBat(bat); err != nil {
+		if err := acadbp.RunBatCommands(bat, viper.GetString("encoding")); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
