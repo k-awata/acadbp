@@ -51,7 +51,7 @@ var dwgoutCmd = &cobra.Command{
 			return
 		}
 
-		scr, err := acadbp.CreateTempFile("*.scr", "_.saveas "+viper.GetString("dwg.format")+" \r\nY\r\n", viper.GetString("encoding"))
+		scr, err := acadbp.CreateTempFile("*.scr", "_.saveas "+viper.GetString("dwg.format")+" \nY\n", viper.GetString("encoding"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return

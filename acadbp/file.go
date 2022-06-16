@@ -33,7 +33,7 @@ func StdinToString() string {
 	s := bufio.NewScanner(os.Stdin)
 	var buf bytes.Buffer
 	for s.Scan() {
-		buf.WriteString(s.Text() + "\r\n")
+		buf.WriteString(s.Text() + "\n")
 	}
 	return buf.String()
 }
@@ -44,7 +44,7 @@ func CreateTempFile(name string, contents string, encode string) (string, error)
 	if err != nil {
 		return "", err
 	}
-	str, _, err := transform.String(e.NewEncoder(), contents)
+	str, _, err := transform.String(e.NewEncoder(), strings.ReplaceAll(contents, "\n", "\r\n"))
 	if err != nil {
 		return "", err
 	}

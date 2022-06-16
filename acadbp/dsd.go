@@ -52,7 +52,7 @@ func scanTemplateDsd(r io.Reader) (string, error) {
 				strings.HasPrefix(str, "[MRU ")
 		}
 		if !skip {
-			buf.WriteString(str + "\r\n")
+			buf.WriteString(str + "\n")
 		}
 	}
 	return buf.String(), nil
@@ -84,7 +84,7 @@ func CreateDsdTarget(ftype string, multi string) (string, error) {
 			return "", err
 		}
 	}
-	return "[Target]\r\nType=" + no + "\r\nDWF=" + dwf + "\r\nOUT=" + out + string(os.PathSeparator) + "\r\nPWD=\r\n", nil
+	return "[Target]\nType=" + no + "\nDWF=" + dwf + "\nOUT=" + out + string(os.PathSeparator) + "\nPWD=\n", nil
 }
 
 // CreateDsdSheets returns [DWF6Sheet:*] sections of dsd file for each drawing file
@@ -106,13 +106,13 @@ func CreateDsdSheets(files []string, sname string, sfile string, layout string) 
 		if err != nil {
 			return "", err
 		}
-		buf.WriteString("[DWF6Sheet:" + strings.TrimSuffix(filepath.Base(f), filepath.Ext(f)) + "]\r\n")
-		buf.WriteString("DWG=" + abs + "\r\n")
-		buf.WriteString("Layout=" + layout + "\r\n")
-		buf.WriteString("Setup=" + setup + "\r\n")
-		buf.WriteString("OriginalSheetPath=" + abs + "\r\n")
-		buf.WriteString("Has Plot Port=0\r\n")
-		buf.WriteString("Has3DDWF=0\r\n")
+		buf.WriteString("[DWF6Sheet:" + strings.TrimSuffix(filepath.Base(f), filepath.Ext(f)) + "]\n")
+		buf.WriteString("DWG=" + abs + "\n")
+		buf.WriteString("Layout=" + layout + "\n")
+		buf.WriteString("Setup=" + setup + "\n")
+		buf.WriteString("OriginalSheetPath=" + abs + "\n")
+		buf.WriteString("Has Plot Port=0\n")
+		buf.WriteString("Has3DDWF=0\n")
 	}
 	return buf.String(), nil
 }

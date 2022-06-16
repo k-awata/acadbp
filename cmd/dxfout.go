@@ -54,7 +54,7 @@ var dxfoutCmd = &cobra.Command{
 		scr, err := acadbp.CreateTempFile("*.scr", "_.saveas DXF "+
 			"P "+acadbp.BoolToYesNo(viper.GetBool("dxf.preview"))+" "+
 			"V "+viper.GetString("dxf.format")+" "+
-			viper.GetString("dxf.dp")+" \r\nY\r\n", viper.GetString("encoding"))
+			viper.GetString("dxf.dp")+" \nY\n", viper.GetString("encoding"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
