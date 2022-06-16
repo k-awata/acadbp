@@ -65,9 +65,12 @@ var publishCmd = &cobra.Command{
 		scr, err := acadbp.CreateTempFile("*.scr", "_.-publish "+dsd+"\n", viper.GetString("encoding"))
 		cobra.CheckErr(err)
 
-		bat := acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), nil)
-		err = acadbp.RunBatCommands(bat, viper.GetString("encoding"))
+		err = acadbp.RunBatCommands(
+			acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files),
+			viper.GetString("encoding"),
+		)
 		cobra.CheckErr(err)
+		cmd.Println("Running accoreconsole...")
 	},
 }
 

@@ -2,7 +2,6 @@ package acadbp
 
 import (
 	"bytes"
-	"fmt"
 	"os/exec"
 )
 
@@ -33,6 +32,5 @@ func RunBatCommands(cmd string, encode string) error {
 	if err := exec.Command("cmd", "/c", temp).Start(); err != nil {
 		return err
 	}
-	fmt.Println("Running accoreconsole...")
 	return nil
 }

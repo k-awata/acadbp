@@ -22,7 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -45,8 +44,7 @@ var initconfCmd = &cobra.Command{
 
 		err = viper.WriteConfig()
 		cobra.CheckErr(err)
-
-		fmt.Println("acadbp saved config file")
+		cmd.Println("acadbp saved config file")
 	},
 }
 

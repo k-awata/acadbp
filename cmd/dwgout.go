@@ -48,9 +48,12 @@ var dwgoutCmd = &cobra.Command{
 		err = acadbp.CreateEmptyFiles(files, ".dwg")
 		cobra.CheckErr(err)
 
-		bat := acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files)
-		err = acadbp.RunBatCommands(bat, viper.GetString("encoding"))
+		err = acadbp.RunBatCommands(
+			acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files),
+			viper.GetString("encoding"),
+		)
 		cobra.CheckErr(err)
+		cmd.Println("Running accoreconsole...")
 	},
 }
 
