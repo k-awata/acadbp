@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,7 +24,15 @@ func ReadTemplateDsd(dsd string, encode string) (string, error) {
 		return "", err
 	}
 	defer file.Close()
-	s := bufio.NewScanner(transform.NewReader(file, e.NewDecoder()))
+	str, err := scanTemplateDsd(transform.NewReader(file, e.NewDecoder()))
+	if err != nil {
+		return "", err
+	}
+	return str, nil
+}
+
+func scanTemplateDsd(r io.Reader) (string, error) {
+	s := bufio.NewScanner(r)
 	skip := false
 	first := true
 	var buf bytes.Buffer
