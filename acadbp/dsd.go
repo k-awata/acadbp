@@ -60,7 +60,25 @@ func scanTemplateDsd(r io.Reader) (string, error) {
 
 // CreateDsdTarget returns [Target] section of dsd file with specified options
 func CreateDsdTarget(ftype string, multi string) (string, error) {
-	// Type=
+	typeno, err := getDsdTargetType(ftype, multi)
+	if err != nil {
+		return "", err
+	}
+	out, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	dwf := filepath.Join(out, "plot.dwf")
+	if multi != "" {
+		dwf, err = filepath.Abs(multi)
+		if err != nil {
+			return "", err
+		}
+	}
+	return "[Target]\nType=" + typeno + "\nDWF=" + dwf + "\nOUT=" + out + string(os.PathSeparator) + "\nPWD=\n", nil
+}
+
+func getDsdTargetType(ftype string, multi string) (string, error) {
 	no := ""
 	ok := false
 	if multi == "" {
@@ -71,20 +89,7 @@ func CreateDsdTarget(ftype string, multi string) (string, error) {
 	if !ok {
 		return "", errors.New("invalid output type")
 	}
-	// OUT=
-	out, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	// DWF=
-	dwf := filepath.Join(out, "plot.dwf")
-	if multi != "" {
-		dwf, err = filepath.Abs(multi)
-		if err != nil {
-			return "", err
-		}
-	}
-	return "[Target]\nType=" + no + "\nDWF=" + dwf + "\nOUT=" + out + string(os.PathSeparator) + "\nPWD=\n", nil
+	return no, nil
 }
 
 // CreateDsdSheets returns [DWF6Sheet:*] sections of dsd file for each drawing file
