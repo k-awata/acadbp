@@ -35,7 +35,6 @@ var publishCmd = &cobra.Command{
 	Use:     "publish input_file...",
 	Aliases: []string{"p"},
 	Short:   "Publish input drawing files with specified page setup",
-	Long:    "Publish input drawing files with specified page setup",
 	Example: `  acadbp publish --setup-file setup.dwg --setup-name Setup1 *.dxf`,
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

@@ -35,7 +35,6 @@ var dxfoutCmd = &cobra.Command{
 	Use:     "dxfout input_file...",
 	Aliases: []string{"dxf", "x"},
 	Short:   "Convert input drawing files to DXF files",
-	Long:    "Convert input drawing files to DXF files",
 	Example: `  acadbp dxfout *.dwg
   acadbp dxfout --format 2018 --dp Binary --preview *.dwg`,
 	Args: cobra.MinimumNArgs(1),

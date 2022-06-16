@@ -36,7 +36,6 @@ var scriptCmd = &cobra.Command{
 	Use:     "script scr_file input_file...",
 	Aliases: []string{"scr", "s"},
 	Short:   "Run script file for each input file",
-	Long:    "Run script file for each input file",
 	Example: `  acadbp script example.scr *.dwg`,
 	Args:    cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {

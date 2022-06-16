@@ -34,7 +34,6 @@ import (
 var initconfCmd = &cobra.Command{
 	Use:     "initconf",
 	Short:   "Create acadbp config file to home directory",
-	Long:    "Create acadbp config file to home directory",
 	Example: `  acadbp initconf --encoding sjis --accorepath "C:\Program Files\Autodesk\<your-acad-ver>\accoreconsole.exe"`,
 	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {

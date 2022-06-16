@@ -35,7 +35,6 @@ var dwgoutCmd = &cobra.Command{
 	Use:     "dwgout input_file...",
 	Aliases: []string{"dwg", "w"},
 	Short:   "Convert input drawing files to DWG files",
-	Long:    "Convert input drawing files to DWG files",
 	Example: `  acadbp dwgout *.dxf
   acadbp dwgout --format 2010 *.dwg`,
 	Args: cobra.MinimumNArgs(1),
