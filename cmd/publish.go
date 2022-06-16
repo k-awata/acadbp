@@ -39,7 +39,16 @@ var publishCmd = &cobra.Command{
 	Example: `  acadbp publish --setup-file setup.dwg --setup-name Setup1 *.dxf`,
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		files := acadbp.ExpandGlobPattern(args)
+		if err := acadbp.CheckAcCorePath(viper.GetString("accorepath")); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
+
+		files, err := acadbp.ExpandGlobPattern(args)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
 
 		// Create dsd file
 		tmpl := "[DWF6Version]\r\nVer=1\r\n[DWF6MinorVersion]\r\nMinorVer=1\r\n"
@@ -79,12 +88,7 @@ var publishCmd = &cobra.Command{
 			return
 		}
 
-		bat, err := acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), nil)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
-
+		bat := acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), nil)
 		if err := acadbp.RunBatCommands(bat, viper.GetString("encoding")); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return

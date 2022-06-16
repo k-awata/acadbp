@@ -40,11 +40,19 @@ var scriptCmd = &cobra.Command{
 	Example: `  acadbp script example.scr *.dwg`,
 	Args:    cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		files := acadbp.ExpandGlobPattern(args[1:])
+		if err := acadbp.CheckAcCorePath(viper.GetString("accorepath")); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
+
+		files, err := acadbp.ExpandGlobPattern(args[1:])
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
 
 		// Read file, or stdio if arg is "-"
 		scr := ""
-		var err error
 		if args[0] == "-" {
 			scr, err = acadbp.CreateTempFile("*.scr", acadbp.StdinToString(), viper.GetString("encoding"))
 			if err != nil {
@@ -59,12 +67,7 @@ var scriptCmd = &cobra.Command{
 			}
 		}
 
-		bat, err := acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
-
+		bat := acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files)
 		if err := acadbp.RunBatCommands(bat, viper.GetString("encoding")); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return

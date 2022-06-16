@@ -40,7 +40,16 @@ var dxfoutCmd = &cobra.Command{
   acadbp dxfout --format 2018 --dp Binary --preview *.dwg`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		files := acadbp.ExpandGlobPattern(args)
+		if err := acadbp.CheckAcCorePath(viper.GetString("accorepath")); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
+
+		files, err := acadbp.ExpandGlobPattern(args)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return
+		}
 
 		scr, err := acadbp.CreateTempFile("*.scr", "_.saveas DXF "+
 			"P "+acadbp.BoolToYesNo(viper.GetBool("dxf.preview"))+" "+
@@ -51,17 +60,12 @@ var dxfoutCmd = &cobra.Command{
 			return
 		}
 
-		bat, err := acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
-
 		if err := acadbp.CreateEmptyFiles(files, ".dxf"); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
 
+		bat := acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files)
 		if err := acadbp.RunBatCommands(bat, viper.GetString("encoding")); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return

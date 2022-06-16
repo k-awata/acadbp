@@ -2,20 +2,12 @@ package acadbp
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
-	"os"
 	"os/exec"
 )
 
 // CreateBatContents creates bat file to run accoreconsole and returns that filepath
-func CreateBatContents(accore string, scr string, log string, files []string) (string, error) {
-	if _, err := os.Stat(accore); err != nil {
-		return "", errors.New("acadbp cannot find accoreconsole binary")
-	}
-	if _, err := os.Stat(scr); err != nil {
-		return "", errors.New("acadbp cannot find script file")
-	}
+func CreateBatContents(accore string, scr string, log string, files []string) string {
 	var buf bytes.Buffer
 	buf.WriteString("@echo off\r\n")
 	buf.WriteString("setlocal\r\n")
@@ -24,15 +16,12 @@ func CreateBatContents(accore string, scr string, log string, files []string) (s
 	buf.WriteString("set log=" + log + "\r\n")
 	if len(files) == 0 {
 		buf.WriteString(`"%acc%" /s "%scr%" >> "%log%"` + "\r\n")
-		return buf.String(), nil
+		return buf.String()
 	}
 	for _, f := range files {
-		if _, err := os.Stat(f); err != nil {
-			return "", errors.New("acadbp cannot find drawing " + f)
-		}
 		buf.WriteString(`"%acc%" /i "` + f + `" /s "%scr%" >> "%log%"` + "\r\n")
 	}
-	return buf.String(), nil
+	return buf.String()
 }
 
 // RunBatCommands executes bat commands

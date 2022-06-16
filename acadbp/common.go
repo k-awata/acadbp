@@ -3,6 +3,7 @@ package acadbp
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -19,21 +20,32 @@ func BoolToYesNo(b bool) string {
 	return "N"
 }
 
+// CheckAcCorePath returns error if path of accoreconsole is incorrect
+func CheckAcCorePath(accore string) error {
+	if !strings.EqualFold(filepath.Base(accore), "accoreconsole.exe") {
+		return errors.New("accorepath is incorrect")
+	}
+	if _, err := os.Stat(accore); err != nil {
+		return errors.New("acadbp cannot find accoreconsole binary")
+	}
+	return nil
+}
+
 // ExpandGlobPattern returns filenames with the glob patterns expanded from filenames include * or ?
-func ExpandGlobPattern(args []string) []string {
+func ExpandGlobPattern(args []string) ([]string, error) {
 	ret := []string{}
 	for _, arg := range args {
 		if strings.ContainsRune(arg, '*') || strings.ContainsRune(arg, '?') {
 			g, err := filepath.Glob(arg)
 			if err != nil {
-				continue
+				return nil, err
 			}
 			ret = append(ret, g...)
 		} else {
 			ret = append(ret, arg)
 		}
 	}
-	return ret
+	return ret, nil
 }
 
 // StdinToString returns string from stdin
