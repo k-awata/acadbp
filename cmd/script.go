@@ -22,8 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/k-awata/acadbp/acadbp"
@@ -39,38 +37,25 @@ var scriptCmd = &cobra.Command{
 	Example: `  acadbp script example.scr *.dwg`,
 	Args:    cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := acadbp.CheckAcCorePath(viper.GetString("accorepath")); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		err := acadbp.CheckAcCorePath(viper.GetString("accorepath"))
+		cobra.CheckErr(err)
 
 		files, err := acadbp.ExpandGlobPattern(args[1:])
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		cobra.CheckErr(err)
 
 		// Read file, or stdio if arg is "-"
 		scr := ""
 		if args[0] == "-" {
 			scr, err = acadbp.CreateTempFile("*.scr", acadbp.StdinToString(), viper.GetString("encoding"))
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				return
-			}
+			cobra.CheckErr(err)
 		} else {
 			scr, err = filepath.Abs(args[0])
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				return
-			}
+			cobra.CheckErr(err)
 		}
 
 		bat := acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files)
-		if err := acadbp.RunBatCommands(bat, viper.GetString("encoding")); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		err = acadbp.RunBatCommands(bat, viper.GetString("encoding"))
+		cobra.CheckErr(err)
 	},
 }
 

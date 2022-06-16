@@ -22,9 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/k-awata/acadbp/acadbp"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -39,36 +36,24 @@ var dxfoutCmd = &cobra.Command{
   acadbp dxfout --format 2018 --dp Binary --preview *.dwg`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := acadbp.CheckAcCorePath(viper.GetString("accorepath")); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		err := acadbp.CheckAcCorePath(viper.GetString("accorepath"))
+		cobra.CheckErr(err)
 
 		files, err := acadbp.ExpandGlobPattern(args)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		cobra.CheckErr(err)
 
 		scr, err := acadbp.CreateTempFile("*.scr", "_.saveas DXF "+
 			"P "+acadbp.BoolToYesNo(viper.GetBool("dxf.preview"))+" "+
 			"V "+viper.GetString("dxf.format")+" "+
 			viper.GetString("dxf.dp")+" \nY\n", viper.GetString("encoding"))
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		cobra.CheckErr(err)
 
-		if err := acadbp.CreateEmptyFiles(files, ".dxf"); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		err = acadbp.CreateEmptyFiles(files, ".dxf")
+		cobra.CheckErr(err)
 
 		bat := acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files)
-		if err := acadbp.RunBatCommands(bat, viper.GetString("encoding")); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		err = acadbp.RunBatCommands(bat, viper.GetString("encoding"))
+		cobra.CheckErr(err)
 	},
 }
 

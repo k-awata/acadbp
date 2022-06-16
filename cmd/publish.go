@@ -22,9 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/k-awata/acadbp/acadbp"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -38,59 +35,39 @@ var publishCmd = &cobra.Command{
 	Example: `  acadbp publish --setup-file setup.dwg --setup-name Setup1 *.dxf`,
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := acadbp.CheckAcCorePath(viper.GetString("accorepath")); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		err := acadbp.CheckAcCorePath(viper.GetString("accorepath"))
+		cobra.CheckErr(err)
 
 		files, err := acadbp.ExpandGlobPattern(args)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		cobra.CheckErr(err)
 
-		// Create dsd file
 		tmpl := "[DWF6Version]\nVer=1\n[DWF6MinorVersion]\nMinorVer=1\n"
 		if viper.GetString("publish.dsd") != "" {
 			tmpl, err = acadbp.ReadTemplateDsd(viper.GetString("publish.dsd"), viper.GetString("encoding"))
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				return
-			}
+			cobra.CheckErr(err)
 		}
+
 		trg, err := acadbp.CreateDsdTarget(
 			viper.GetString("publish.type"),
 			viper.GetString("publish.multi"))
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		cobra.CheckErr(err)
+
 		shts, err := acadbp.CreateDsdSheets(
 			files,
 			viper.GetString("publish.setup-name"),
 			viper.GetString("publish.setup-file"),
 			viper.GetString("publish.layout"))
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		cobra.CheckErr(err)
+
 		dsd, err := acadbp.CreateTempFile("*.dsd", tmpl+trg+shts, viper.GetString("encoding"))
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		cobra.CheckErr(err)
 
 		scr, err := acadbp.CreateTempFile("*.scr", "_.-publish "+dsd+"\n", viper.GetString("encoding"))
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		cobra.CheckErr(err)
 
 		bat := acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), nil)
-		if err := acadbp.RunBatCommands(bat, viper.GetString("encoding")); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		err = acadbp.RunBatCommands(bat, viper.GetString("encoding"))
+		cobra.CheckErr(err)
 	},
 }
 

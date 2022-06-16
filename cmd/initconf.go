@@ -38,18 +38,14 @@ var initconfCmd = &cobra.Command{
 	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		home, err := os.UserHomeDir()
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
-		if _, err := os.Create(filepath.Join(home, ".acadbp.yaml")); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
-		if err := viper.WriteConfig(); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
-		}
+		cobra.CheckErr(err)
+
+		_, err = os.Create(filepath.Join(home, ".acadbp.yaml"))
+		cobra.CheckErr(err)
+
+		err = viper.WriteConfig()
+		cobra.CheckErr(err)
+
 		fmt.Println("acadbp saved config file")
 	},
 }
