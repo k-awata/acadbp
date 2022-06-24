@@ -22,6 +22,8 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"os"
+
 	"github.com/k-awata/acadbp/acadbp"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -36,27 +38,33 @@ var dxfoutCmd = &cobra.Command{
   acadbp dxfout --format 2018 --dp Binary --preview *.dwg`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		err := acadbp.CheckAcCorePath(viper.GetString("accorepath"))
-		cobra.CheckErr(err)
+		batcher := acadbp.NewBatcher(viper.GetString("accorepath"))
+		cobra.CheckErr(batcher.CheckAccore())
 
 		files, err := acadbp.ExpandGlobPattern(args)
 		cobra.CheckErr(err)
 
-		scr, err := acadbp.CreateTempFile("*.scr", "_.saveas DXF "+
-			"P "+acadbp.BoolToYesNo(viper.GetBool("dxf.preview"))+" "+
-			"V "+viper.GetString("dxf.format")+" "+
-			viper.GetString("dxf.dp")+" \nY\n", viper.GetString("encoding"))
-		cobra.CheckErr(err)
+		if viper.GetString("log") != "" {
+			log, err := os.OpenFile(
+				viper.GetString("log"),
+				os.O_WRONLY|os.O_CREATE|os.O_APPEND,
+				os.ModePerm,
+			)
+			cobra.CheckErr(err)
+			defer log.Close()
+			batcher.SetOutput(log)
+		}
 
-		err = acadbp.CreateEmptyFiles(files, ".dxf")
-		cobra.CheckErr(err)
-
-		err = acadbp.RunBatCommands(
-			acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files),
+		scr, err := acadbp.CreateTempFile(
+			"*.scr",
+			"_.saveas DXF P "+acadbp.BtoYN(viper.GetBool("dxf.preview"))+
+				" V "+viper.GetString("dxf.format")+" "+viper.GetString("dxf.dp")+" \nY\n",
 			viper.GetString("encoding"),
 		)
 		cobra.CheckErr(err)
+
 		cmd.Println("Running accoreconsole...")
+		batcher.RunForEach(scr, files, ".dxf")
 	},
 }
 

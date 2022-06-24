@@ -22,6 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/k-awata/acadbp/acadbp"
@@ -37,11 +38,22 @@ var scriptCmd = &cobra.Command{
 	Example: `  acadbp script example.scr *.dwg`,
 	Args:    cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		err := acadbp.CheckAcCorePath(viper.GetString("accorepath"))
-		cobra.CheckErr(err)
+		batcher := acadbp.NewBatcher(viper.GetString("accorepath"))
+		cobra.CheckErr(batcher.CheckAccore())
 
 		files, err := acadbp.ExpandGlobPattern(args[1:])
 		cobra.CheckErr(err)
+
+		if viper.GetString("log") != "" {
+			log, err := os.OpenFile(
+				viper.GetString("log"),
+				os.O_WRONLY|os.O_CREATE|os.O_APPEND,
+				os.ModePerm,
+			)
+			cobra.CheckErr(err)
+			defer log.Close()
+			batcher.SetOutput(log)
+		}
 
 		// Read file, or stdio if arg is "-"
 		scr := ""
@@ -53,12 +65,8 @@ var scriptCmd = &cobra.Command{
 			cobra.CheckErr(err)
 		}
 
-		err = acadbp.RunBatCommands(
-			acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files),
-			viper.GetString("encoding"),
-		)
-		cobra.CheckErr(err)
 		cmd.Println("Running accoreconsole...")
+		batcher.RunForEach(scr, files, "")
 	},
 }
 

@@ -22,6 +22,8 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"os"
+
 	"github.com/k-awata/acadbp/acadbp"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,42 +37,47 @@ var publishCmd = &cobra.Command{
 	Example: `  acadbp publish --setup-file setup.dwg --setup-name Setup1 *.dxf`,
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		err := acadbp.CheckAcCorePath(viper.GetString("accorepath"))
-		cobra.CheckErr(err)
+		batcher := acadbp.NewBatcher(viper.GetString("accorepath"))
+		cobra.CheckErr(batcher.CheckAccore())
 
 		files, err := acadbp.ExpandGlobPattern(args)
 		cobra.CheckErr(err)
 
-		tmpl := "[DWF6Version]\nVer=1\n[DWF6MinorVersion]\nMinorVer=1\n"
-		if viper.GetString("publish.dsd") != "" {
-			tmpl, err = acadbp.ReadTemplateDsd(viper.GetString("publish.dsd"), viper.GetString("encoding"))
+		if viper.GetString("log") != "" {
+			log, err := os.OpenFile(
+				viper.GetString("log"),
+				os.O_WRONLY|os.O_CREATE|os.O_APPEND,
+				os.ModePerm,
+			)
 			cobra.CheckErr(err)
+			defer log.Close()
+			batcher.SetOutput(log)
 		}
 
-		trg, err := acadbp.CreateDsdTarget(
+		build := acadbp.NewDsdBuilder()
+		cobra.CheckErr(build.SetEncoding(viper.GetString("encoding")))
+		if viper.GetString("publish.dsd") != "" {
+			cobra.CheckErr(build.SetTemplate(viper.GetString("publish.dsd")))
+		}
+		cobra.CheckErr(build.SetOutputFile(
 			viper.GetString("publish.type"),
-			viper.GetString("publish.multi"))
-		cobra.CheckErr(err)
-
-		shts, err := acadbp.CreateDsdSheets(
+			viper.GetString("publish.multi"),
+		))
+		cobra.CheckErr(build.SetSheets(
 			files,
+			viper.GetString("publish.layout"),
 			viper.GetString("publish.setup-name"),
 			viper.GetString("publish.setup-file"),
-			viper.GetString("publish.layout"))
-		cobra.CheckErr(err)
+		))
 
-		dsd, err := acadbp.CreateTempFile("*.dsd", tmpl+trg+shts, viper.GetString("encoding"))
+		dsd, err := acadbp.CreateTempFile("*.dsd", build.Output(), viper.GetString("encoding"))
 		cobra.CheckErr(err)
 
 		scr, err := acadbp.CreateTempFile("*.scr", "_.-publish "+dsd+"\n", viper.GetString("encoding"))
 		cobra.CheckErr(err)
 
-		err = acadbp.RunBatCommands(
-			acadbp.CreateBatContents(viper.GetString("accorepath"), scr, viper.GetString("log"), files),
-			viper.GetString("encoding"),
-		)
-		cobra.CheckErr(err)
 		cmd.Println("Running accoreconsole...")
+		batcher.Run(scr)
 	},
 }
 
