@@ -76,7 +76,6 @@ var publishCmd = &cobra.Command{
 		scr, err := acadbp.CreateTempFile("*.scr", "_.-publish "+dsd+"\n", viper.GetString("encoding"))
 		cobra.CheckErr(err)
 
-		cmd.Println("Running accoreconsole...")
 		batcher.Run(scr)
 	},
 }

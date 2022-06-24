@@ -9,7 +9,9 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
+	"github.com/schollz/progressbar/v3"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
@@ -44,7 +46,7 @@ func (b *Batcher) Run(scrfile string) {
 	dec := b.encode.NewDecoder()
 	log := log.Default()
 	log.SetOutput(b.out)
-
+	bar := b.makePbar(1)
 	out, err := exec.Command(b.accore, b.sflag, scrfile).Output()
 	if err != nil {
 		log.Println(err)
@@ -55,6 +57,7 @@ func (b *Batcher) Run(scrfile string) {
 	}
 	log.Println("run script")
 	fmt.Fprintln(b.out, string(bt))
+	bar.Add(1)
 }
 
 // RunForEach runs batch processing for each input file
@@ -62,8 +65,9 @@ func (b *Batcher) RunForEach(scrfile string, files []string, ext string) {
 	dec := b.encode.NewDecoder()
 	log := log.Default()
 	log.SetOutput(b.out)
-
-	for _, f := range files {
+	bar := b.makePbar(len(files))
+	for i, f := range files {
+		bar.Set(i)
 		if err := createEmptyFile(f, ext); err != nil {
 			log.Println(err)
 			continue
@@ -81,6 +85,18 @@ func (b *Batcher) RunForEach(scrfile string, files []string, ext string) {
 		log.Println("run script for " + filepath.Base(f))
 		fmt.Fprintln(b.out, string(bt))
 	}
+	bar.Add(1)
+}
+
+func (b *Batcher) makePbar(max int) *progressbar.ProgressBar {
+	return progressbar.NewOptions(max,
+		progressbar.OptionUseANSICodes(true),
+		progressbar.OptionSetVisibility(b.out != os.Stdout),
+		progressbar.OptionSetDescription("Running accoreconsole..."),
+		progressbar.OptionSetRenderBlankState(true),
+		progressbar.OptionOnCompletion(func() { time.Sleep(500 * time.Millisecond) }),
+		progressbar.OptionShowCount(),
+	)
 }
 
 // CheckAccore returns an error if accoreconsole path is invalid

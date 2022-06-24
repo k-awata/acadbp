@@ -65,7 +65,6 @@ var scriptCmd = &cobra.Command{
 			cobra.CheckErr(err)
 		}
 
-		cmd.Println("Running accoreconsole...")
 		batcher.RunForEach(scr, files, "")
 	},
 }
