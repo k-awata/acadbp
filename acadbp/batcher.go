@@ -43,47 +43,51 @@ func (b *Batcher) SetOutput(w io.Writer) {
 
 // Run runs batch processing
 func (b *Batcher) Run(scrfile string) {
+	inflog := log.New(b.out, "[INFO] ", log.Ldate|log.Ltime)
+	errlog := log.New(b.out, "[ERROR] ", log.Ldate|log.Ltime)
 	dec := b.encode.NewDecoder()
-	log := log.Default()
-	log.SetOutput(b.out)
+
 	bar := b.makePbar(1)
-	out, err := exec.Command(b.accore, b.sflag, scrfile).Output()
+	out, err := exec.Command(b.accore, b.sflag, scrfile).CombinedOutput()
 	if err != nil {
-		log.Println(err)
+		errlog.Println(err)
 	}
 	bt, _, err := transform.Bytes(dec, out)
 	if err != nil {
-		log.Println(err)
+		errlog.Println(err)
 	}
-	log.Println("run script")
+	inflog.Println("run script")
 	fmt.Fprintln(b.out, string(bt))
+	inflog.Println("end script")
 	bar.Add(1)
 }
 
 // RunForEach runs batch processing for each input file
 func (b *Batcher) RunForEach(scrfile string, files []string, ext string) {
+	inflog := log.New(b.out, "[INFO] ", log.Ldate|log.Ltime)
+	errlog := log.New(b.out, "[ERROR] ", log.Ldate|log.Ltime)
 	dec := b.encode.NewDecoder()
-	log := log.Default()
-	log.SetOutput(b.out)
+
 	bar := b.makePbar(len(files))
 	for i, f := range files {
 		bar.Set(i)
 		if err := createEmptyFile(f, ext); err != nil {
-			log.Println(err)
+			errlog.Println(err)
 			continue
 		}
-		out, err := exec.Command(b.accore, b.iflag, f, b.sflag, scrfile).Output()
+		out, err := exec.Command(b.accore, b.iflag, f, b.sflag, scrfile).CombinedOutput()
 		if err != nil {
-			log.Println(err)
+			errlog.Println(err)
 			continue
 		}
 		bt, _, err := transform.Bytes(dec, out)
 		if err != nil {
-			log.Println(err)
+			errlog.Println(err)
 			continue
 		}
-		log.Println("run script for " + filepath.Base(f))
+		inflog.Println("run script for " + filepath.Base(f))
 		fmt.Fprintln(b.out, string(bt))
+		inflog.Println("end script")
 	}
 	bar.Add(1)
 }
