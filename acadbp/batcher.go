@@ -9,9 +9,11 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/schollz/progressbar/v3"
+	"golang.org/x/term"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
@@ -95,7 +97,7 @@ func (b *Batcher) RunForEach(scrfile string, files []string, ext string) {
 func (b *Batcher) makePbar(max int) *progressbar.ProgressBar {
 	return progressbar.NewOptions(max,
 		progressbar.OptionUseANSICodes(true),
-		progressbar.OptionSetVisibility(b.out != os.Stdout),
+		progressbar.OptionSetVisibility(b.out != os.Stdout && term.IsTerminal(int(syscall.Stdout))),
 		progressbar.OptionSetDescription("Running accoreconsole..."),
 		progressbar.OptionSetRenderBlankState(true),
 		progressbar.OptionOnCompletion(func() { time.Sleep(500 * time.Millisecond) }),
