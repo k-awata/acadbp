@@ -1,6 +1,7 @@
 package acadbp
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -8,7 +9,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -25,6 +28,7 @@ type Batcher struct {
 	sflag  string
 	encode encoding.Encoding
 	out    io.Writer
+	numbat int
 }
 
 // NewBatcher returns a new batcher that batch-processes drawing files with accoreconsole
@@ -35,6 +39,7 @@ func NewBatcher(accorepath string) *Batcher {
 		sflag:  "/s",
 		encode: unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM),
 		out:    os.Stdout,
+		numbat: runtime.NumCPU(),
 	}
 }
 
@@ -45,53 +50,72 @@ func (b *Batcher) SetOutput(w io.Writer) {
 
 // Run runs batch processing
 func (b *Batcher) Run(scrfile string) {
-	inflog := log.New(b.out, "[INFO] ", log.Ldate|log.Ltime)
-	errlog := log.New(b.out, "[ERROR] ", log.Ldate|log.Ltime)
 	dec := b.encode.NewDecoder()
-
 	bar := b.makePbar(1)
+
+	var buf bytes.Buffer
+	defer func() {
+		buf.WriteTo(b.out)
+		bar.Add(1)
+	}()
+	ilog := log.New(&buf, "[INFO] ", log.Ldate|log.Ltime)
+	elog := log.New(&buf, "[ERROR] ", log.Ldate|log.Ltime)
+	ilog.Println("run script")
 	out, err := exec.Command(b.accore, b.sflag, scrfile).CombinedOutput()
 	if err != nil {
-		errlog.Println(err)
+		elog.Println(err)
+		return
 	}
-	bt, _, err := transform.Bytes(dec, out)
+	dout, _, err := transform.Bytes(dec, out)
 	if err != nil {
-		errlog.Println(err)
+		elog.Println(err)
+		return
 	}
-	inflog.Println("run script")
-	fmt.Fprintln(b.out, string(bt))
-	inflog.Println("end script")
-	bar.Add(1)
+	fmt.Fprintln(&buf, string(dout))
+	ilog.Println("end script")
 }
 
 // RunForEach runs batch processing for each input file
 func (b *Batcher) RunForEach(scrfile string, files []string, ext string) {
-	inflog := log.New(b.out, "[INFO] ", log.Ldate|log.Ltime)
-	errlog := log.New(b.out, "[ERROR] ", log.Ldate|log.Ltime)
 	dec := b.encode.NewDecoder()
-
 	bar := b.makePbar(len(files))
-	for i, f := range files {
-		bar.Set(i)
-		if err := createEmptyFile(f, ext); err != nil {
-			errlog.Println(err)
-			continue
-		}
-		out, err := exec.Command(b.accore, b.iflag, f, b.sflag, scrfile).CombinedOutput()
-		if err != nil {
-			errlog.Println(err)
-			continue
-		}
-		bt, _, err := transform.Bytes(dec, out)
-		if err != nil {
-			errlog.Println(err)
-			continue
-		}
-		inflog.Println("run script for " + filepath.Base(f))
-		fmt.Fprintln(b.out, string(bt))
-		inflog.Println("end script")
+
+	sp := make(chan struct{}, b.numbat)
+	var wg sync.WaitGroup
+	for _, f := range files {
+		sp <- struct{}{}
+		wg.Add(1)
+		go func(in string) {
+			var buf bytes.Buffer
+			defer func() {
+				buf.WriteTo(b.out)
+				bar.Add(1)
+				<-sp
+				wg.Done()
+			}()
+			ilog := log.New(&buf, "[INFO] ", log.Ldate|log.Ltime)
+			elog := log.New(&buf, "[ERROR] ", log.Ldate|log.Ltime)
+			ilog.Println("run script for " + filepath.Base(in))
+			if err := createEmptyFile(in, ext); err != nil {
+				elog.Println(err)
+				return
+			}
+			out, err := exec.Command(b.accore, b.iflag, in, b.sflag, scrfile).CombinedOutput()
+			if err != nil {
+				elog.Println(err)
+				return
+			}
+			dout, _, err := transform.Bytes(dec, out)
+			if err != nil {
+				elog.Println(err)
+				return
+			}
+			fmt.Fprintln(&buf, string(dout))
+			ilog.Println("end script")
+		}(f)
+		time.Sleep(50 * time.Millisecond)
 	}
-	bar.Add(1)
+	wg.Wait()
 }
 
 func (b *Batcher) makePbar(max int) *progressbar.ProgressBar {
