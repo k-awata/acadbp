@@ -39,8 +39,9 @@ var initconfCmd = &cobra.Command{
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
-		_, err = os.Create(filepath.Join(home, ".acadbp.yaml"))
+		f, err := os.Create(filepath.Join(home, ".acadbp.yaml"))
 		cobra.CheckErr(err)
+		f.Close()
 
 		cobra.CheckErr(viper.WriteConfig())
 		cmd.Println("acadbp saved config file")

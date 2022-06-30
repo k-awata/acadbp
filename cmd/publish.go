@@ -72,9 +72,11 @@ var publishCmd = &cobra.Command{
 
 		dsd, err := acadbp.CreateTempFile("*.dsd", build.Output(), viper.GetString("encoding"))
 		cobra.CheckErr(err)
+		defer os.Remove(dsd)
 
 		scr, err := acadbp.CreateTempFile("*.scr", "_.-publish "+dsd+"\n", viper.GetString("encoding"))
 		cobra.CheckErr(err)
+		defer os.Remove(scr)
 
 		batcher.Run(scr)
 	},

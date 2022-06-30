@@ -60,6 +60,7 @@ var scriptCmd = &cobra.Command{
 		if args[0] == "-" {
 			scr, err = acadbp.CreateTempFile("*.scr", acadbp.StdinToString(), viper.GetString("encoding"))
 			cobra.CheckErr(err)
+			defer os.Remove(scr)
 		} else {
 			scr, err = filepath.Abs(args[0])
 			cobra.CheckErr(err)

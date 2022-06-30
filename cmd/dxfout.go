@@ -62,6 +62,7 @@ var dxfoutCmd = &cobra.Command{
 			viper.GetString("encoding"),
 		)
 		cobra.CheckErr(err)
+		defer os.Remove(scr)
 
 		batcher.RunForEach(scr, files, ".dxf")
 	},
