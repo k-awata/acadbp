@@ -74,7 +74,7 @@ var publishCmd = &cobra.Command{
 		cobra.CheckErr(err)
 		defer os.Remove(dsd)
 
-		scr, err := acadbp.CreateTempFile("*.scr", "_.-publish "+dsd+"\n", viper.GetString("encoding"))
+		scr, err := acadbp.CreateTempFile("*.scr", "_.-publish "+dsd+"\nfiledia 1\n", viper.GetString("encoding"))
 		cobra.CheckErr(err)
 		defer os.Remove(scr)
 
