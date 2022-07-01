@@ -61,11 +61,7 @@ func (b *Batcher) Run(scrfile string) {
 	ilog := log.New(&buf, "[INFO] ", log.Ldate|log.Ltime)
 	elog := log.New(&buf, "[ERROR] ", log.Ldate|log.Ltime)
 	ilog.Println("run script")
-	out, err := exec.Command(b.accore, b.sflag, scrfile).CombinedOutput()
-	if err != nil {
-		elog.Println(err)
-		return
-	}
+	out, _ := exec.Command(b.accore, b.sflag, scrfile).CombinedOutput()
 	dout, _, err := transform.Bytes(dec, out)
 	if err != nil {
 		elog.Println(err)
@@ -100,11 +96,7 @@ func (b *Batcher) RunForEach(scrfile string, files []string, ext string) {
 				elog.Println(err)
 				return
 			}
-			out, err := exec.Command(b.accore, b.iflag, in, b.sflag, scrfile).CombinedOutput()
-			if err != nil {
-				elog.Println(err)
-				return
-			}
+			out, _ := exec.Command(b.accore, b.iflag, in, b.sflag, scrfile).CombinedOutput()
 			dout, _, err := transform.Bytes(dec, out)
 			if err != nil {
 				elog.Println(err)
