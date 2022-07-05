@@ -22,6 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"io"
 	"os"
 	"path/filepath"
 
@@ -58,7 +59,9 @@ var scriptCmd = &cobra.Command{
 		// Read file, or stdio if arg is "-"
 		scr := ""
 		if args[0] == "-" {
-			scr, err = acadbp.CreateTempFile("*.scr", acadbp.StdinToString(), viper.GetString("encoding"))
+			s, err := io.ReadAll(os.Stdin)
+			cobra.CheckErr(err)
+			scr, err = acadbp.CreateTempFile("*.scr", string(s), viper.GetString("encoding"))
 			cobra.CheckErr(err)
 			defer os.Remove(scr)
 		} else {

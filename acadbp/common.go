@@ -1,7 +1,6 @@
 package acadbp
 
 import (
-	"bufio"
 	"bytes"
 	"errors"
 	"os"
@@ -56,14 +55,4 @@ func CreateTempFile(name string, contents string, encode string) (string, error)
 		return "", err
 	}
 	return temp.Name(), nil
-}
-
-// StdinToString returns string from stdin
-func StdinToString() string {
-	s := bufio.NewScanner(os.Stdin)
-	var buf bytes.Buffer
-	for s.Scan() {
-		buf.WriteString(s.Text() + "\n")
-	}
-	return buf.String()
 }
