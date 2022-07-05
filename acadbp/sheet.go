@@ -53,14 +53,6 @@ func (s *Sheet) MakeDsdFormat() string {
 		"Layout=" + s.layout + "\n" +
 		"Setup=" + s.setup + "\n" +
 		"OriginalSheetPath=" + s.path + "\n" +
-		"Has Plot Port=" + btoia(s.plotport) + "\n" +
-		"Has3DDWF=" + btoia(s.dwf3d) + "\n"
-}
-
-func btoia(b bool) string {
-	if b {
-		return "1"
-	} else {
-		return "0"
-	}
+		"Has Plot Port=" + Bto10(s.plotport) + "\n" +
+		"Has3DDWF=" + Bto10(s.dwf3d) + "\n"
 }

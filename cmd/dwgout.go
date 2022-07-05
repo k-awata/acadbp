@@ -57,7 +57,8 @@ var dwgoutCmd = &cobra.Command{
 
 		scr, err := acadbp.CreateTempFile(
 			"*.scr",
-			"_.saveas "+viper.GetString("dwg.format")+" \ny\nfiledia 1\n",
+			"_.saveas "+viper.GetString("dwg.format")+
+				" \ny\nfiledia "+acadbp.Bto10(viper.GetBool("filedia"))+"\n",
 			viper.GetString("encoding"),
 		)
 		cobra.CheckErr(err)

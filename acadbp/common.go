@@ -19,6 +19,14 @@ func BtoYN(b bool) string {
 	return "N"
 }
 
+// Bto10 returns "1" if b is true, otherwise "0"
+func Bto10(b bool) string {
+	if b {
+		return "1"
+	}
+	return "0"
+}
+
 // ExpandGlobPattern returns filenames with the glob patterns expanded from filenames include * or ?
 func ExpandGlobPattern(args []string) ([]string, error) {
 	ret := []string{}
